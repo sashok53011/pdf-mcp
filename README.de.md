@@ -45,6 +45,25 @@ python -m pdf_mcp
 
 Limits: maximal 50 Seiten pro Aufruf, maximal 300 DPI, PDF maximal 100 MB.
 
+### `pdf_to_lmstudio_script`
+
+Rendert PDF-Seiten als Bilder neben der PDF und erzeugt ein Python-Skript, das jedes
+Bild an ein LM-Studio-Modell sendet (`http://localhost:1234`, Standardmodell
+`google/gemma-4-12b`) für OCR + Übersetzung ins Russische.
+
+| Parameter | Typ | Standard | Beschreibung |
+|---|---|---|---|
+| `pdf_path` | string | erforderlich | Pfad zu einer lokalen PDF-Datei |
+| `dpi` | int | 150 | Render-Auflösung (50..300) |
+| `page_from` | int | 1 | Erste Seite (1-basiert) |
+| `page_to` | int \| null | null | Letzte Seite (inklusive); null = bis Ende (unter Beachtung der Limits) |
+| `format` | string | "png" | "png" oder "jpeg" |
+| `output_dir` | string \| null | null | Ordner für Bilder und Skript (Standard: neben der PDF) |
+| `prompt` | string \| null | null | Prompt für das Modell (Standard: OCR + Übersetzung ins Russische) |
+| `model` | string | "google/gemma-4-12b" | LM-Studio-Modell-ID |
+| `base_url` | string | "http://localhost:1234" | LM-Studio-Basis-URL |
+| `include_metadata` | bool | true | Kurze Textzusammenfassung voranstellen |
+
 ## Beispielkonfiguration (OpenCode / Claude Desktop / LM Studio)
 
 ```json
