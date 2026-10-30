@@ -1,0 +1,24 @@
+[project]
+name = "pdf-mcp"
+version = "0.1.0"
+description = "MCP server that renders PDF pages to images"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=2.0",
+    "pymupdf>=1.24",
+]
+
+[project.scripts]
+pdf-mcp = "pdf_mcp.__main__:main"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["pdf_mcp*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
