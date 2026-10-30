@@ -1,5 +1,7 @@
 # pdf-mcp
 
+Languages: English | [Русский](README.ru.md) | [Deutsch](README.de.md)
+
 MCP server for working with local PDF files:
 - `pdf_to_images`: render selected pages to PNG/JPEG images.
 - `pdf_to_text`: extract text from selected pages as Markdown (layout-preserving).
