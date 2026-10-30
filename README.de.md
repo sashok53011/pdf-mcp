@@ -62,7 +62,18 @@ Bild an ein LM-Studio-Modell sendet (`http://localhost:1234`, Standardmodell
 | `prompt` | string \| null | null | Prompt für das Modell (Standard: OCR + Übersetzung ins Russische) |
 | `model` | string | "google/gemma-4-12b" | LM-Studio-Modell-ID |
 | `base_url` | string | "http://localhost:1234" | LM-Studio-Basis-URL |
+| `auto_run` | bool | false | Erzeugtes Skript sofort ausführen |
+| `run_timeout` | int | 600 | Timeout in Sekunden bei auto_run=True |
 | `include_metadata` | bool | true | Kurze Textzusammenfassung voranstellen |
+
+### `run_lmstudio_script`
+
+Ein zuvor erzeugtes LM-Studio-Übersetzungsskript ausführen und dessen Ausgabe zurückgeben.
+
+| Parameter | Typ | Standard | Beschreibung |
+|---|---|---|---|
+| `script_path` | string | erforderlich | Pfad zum erzeugten `*_translate.py`-Skript |
+| `timeout` | int | 600 | Timeout in Sekunden |
 
 ## Beispielkonfiguration (OpenCode / Claude Desktop / LM Studio)
 

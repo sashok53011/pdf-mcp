@@ -62,7 +62,18 @@ for OCR + translation to Russian.
 | `prompt` | string \| null | null | Prompt sent to the model (default: OCR + translate to Russian) |
 | `model` | string | "google/gemma-4-12b" | LM Studio model id |
 | `base_url` | string | "http://localhost:1234" | LM Studio base URL |
+| `auto_run` | bool | false | Run the generated script immediately |
+| `run_timeout` | int | 600 | Timeout in seconds when auto_run is True |
 | `include_metadata` | bool | true | Prepend a short Markdown header |
+
+### `run_lmstudio_script`
+
+Run a previously generated LM Studio translation script and return its output.
+
+| Param | Type | Default | Description |
+|---|---|---|---|
+| `script_path` | string | required | Path to the generated `*_translate.py` script |
+| `timeout` | int | 600 | Timeout in seconds |
 
 ## OpenCode / Claude Desktop / LM Studio config example
 
