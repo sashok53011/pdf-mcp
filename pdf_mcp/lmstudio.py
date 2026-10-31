@@ -1,6 +1,8 @@
 """Render PDF pages and generate a Python script for LM Studio translation."""
 
 import asyncio
+import subprocess
+import sys
 from pathlib import Path
 from typing import List, Tuple
 
@@ -28,8 +30,8 @@ def _generate_script(
 import base64
 import json
 from pathlib import Path
-
-import requests
+from urllib.request import Request, urlopen
+from urllib.error import HTTPError, URLError
 
 BASE_URL = {base_url!r}
 MODEL = {model!r}
@@ -58,10 +60,18 @@ def ask(image_path: str) -> str:
         "temperature": 0.2,
         "max_tokens": 4096,
     }}
-    response = requests.post(f"{{BASE_URL}}/v1/chat/completions", json=payload, timeout=300)
-    response.raise_for_status()
-    data = response.json()
-    return data["choices"][0]["message"]["content"]
+    data = json.dumps(payload).encode("utf-8")
+    req = Request(
+        f"{{BASE_URL}}/v1/chat/completions",
+        data=data,
+        headers={{"Content-Type": "application/json"}},
+    )
+    try:
+        with urlopen(req, timeout=300) as response:
+            result = json.loads(response.read().decode("utf-8"))
+    except (HTTPError, URLError) as exc:
+        raise RuntimeError(f"LM Studio request failed: {{exc}}") from exc
+    return result["choices"][0]["message"]["content"]
 
 
 def main() -> None:
@@ -81,7 +91,7 @@ def main() -> None:
     combined = out_dir / "translations.md"
     with combined.open("w", encoding="utf-8") as f:
         for image, text in results.items():
-            f.write(f"# {{image}}\\n\\n{{text}}\\n\\n---\\n\\n")
+            f.write(text.strip() + "\\n\\n")
     print(f"Done. Combined output: {{combined}}")
 
 
@@ -145,3 +155,26 @@ async def render_and_generate_script(
         model,
         base_url,
     )
+
+
+def run_script_sync(script_path: str, timeout: int = 600) -> Tuple[int, str, str, str]:
+    """Run a generated LM Studio script and return (returncode, stdout, stderr, combined_text)."""
+    path = Path(script_path)
+    if not path.is_file():
+        raise FileNotFoundError(f"Script not found: {script_path}")
+    proc = subprocess.run(
+        [sys.executable, str(path)],
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+        cwd=str(path.parent),
+    )
+    combined = ""
+    combined_file = path.parent / "translations.md"
+    if combined_file.is_file():
+        combined = combined_file.read_text(encoding="utf-8")
+    return proc.returncode, proc.stdout, proc.stderr, combined
+
+
+async def run_script(script_path: str, timeout: int = 600) -> Tuple[int, str, str, str]:
+    return await asyncio.to_thread(run_script_sync, script_path, timeout)
