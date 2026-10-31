@@ -62,7 +62,7 @@ python -m pdf_mcp
 | `prompt` | string \| null | null | Промпт для модели (по умолчанию OCR + перевод на русский) |
 | `model` | string | "google/gemma-4-12b" | Идентификатор модели LM Studio |
 | `base_url` | string | "http://localhost:1234" | Базовый URL LM Studio |
-| `auto_run` | bool | false | Запустить сгенерированный скрипт сразу |
+| `auto_run` | bool | true | Запустить сгенерированный скрипт сразу |
 | `run_timeout` | int | 600 | Таймаут в секундах при auto_run=True |
 | `include_metadata` | bool | true | Добавить краткую текстовую сводку |
 

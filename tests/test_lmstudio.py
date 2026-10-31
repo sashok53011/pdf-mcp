@@ -33,7 +33,7 @@ def test_generates_script_and_images(sample_pdf):
     assert os.path.isfile(script_path)
     assert "localhost:1234" in script_content
     assert "google/gemma-4-12b" in script_content
-    assert "requests.post" in script_content
+    assert "urlopen" in script_content
 
 
 def test_output_dir(sample_pdf, tmp_path):

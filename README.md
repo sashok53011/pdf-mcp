@@ -49,7 +49,8 @@ Limits: max 50 pages per call, max 300 DPI, max 100 MB PDF.
 
 Renders PDF pages to images next to the PDF and generates a Python script that sends
 each image to an LM Studio model (`http://localhost:1234`, default model `google/gemma-4-12b`)
-for OCR + translation to Russian.
+for OCR + translation to Russian. If `page_to` is omitted, the whole document is
+processed in chunks of 50 pages. The script runs automatically by default.
 
 | Param | Type | Default | Description |
 |---|---|---|---|
@@ -62,7 +63,7 @@ for OCR + translation to Russian.
 | `prompt` | string \| null | null | Prompt sent to the model (default: OCR + translate to Russian) |
 | `model` | string | "google/gemma-4-12b" | LM Studio model id |
 | `base_url` | string | "http://localhost:1234" | LM Studio base URL |
-| `auto_run` | bool | false | Run the generated script immediately |
+| `auto_run` | bool | true | Run the generated script immediately |
 | `run_timeout` | int | 600 | Timeout in seconds when auto_run is True |
 | `include_metadata` | bool | true | Prepend a short Markdown header |
 

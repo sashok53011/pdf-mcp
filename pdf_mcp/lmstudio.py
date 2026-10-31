@@ -22,6 +22,7 @@ def _generate_script(
     model: str,
     base_url: str,
     prompt: str,
+    combined_filename: str = "translations.md",
 ) -> str:
     images_repr = repr([str(p) for p in image_paths])
     return f'''#!/usr/bin/env python
@@ -37,6 +38,7 @@ BASE_URL = {base_url!r}
 MODEL = {model!r}
 PROMPT = {prompt!r}
 IMAGES = {images_repr}
+COMBINED_FILENAME = {combined_filename!r}
 
 
 def encode_image(path: str) -> str:
@@ -88,7 +90,7 @@ def main() -> None:
         page_file.write_text(text, encoding="utf-8")
         print(f"  -> {{page_file}}")
 
-    combined = out_dir / "translations.md"
+    combined = out_dir / COMBINED_FILENAME
     with combined.open("w", encoding="utf-8") as f:
         for image, text in results.items():
             f.write(text.strip() + "\\n\\n")
@@ -110,6 +112,8 @@ def render_and_generate_script_sync(
     prompt: str | None = None,
     model: str = DEFAULT_MODEL,
     base_url: str = DEFAULT_BASE_URL,
+    script_filename: str | None = None,
+    combined_filename: str | None = None,
 ) -> Tuple[int, List[Path], Path, str]:
     path = validate_pdf_path(pdf_path)
     page_count, pages = render_pdf_sync(pdf_path, dpi=dpi, page_from=page_from, page_to=page_to, fmt=fmt)
@@ -124,9 +128,14 @@ def render_and_generate_script_sync(
         image_path.write_bytes(data)
         image_paths.append(image_path)
 
+    if script_filename is None:
+        script_filename = f"{path.stem}_translate.py"
+    if combined_filename is None:
+        combined_filename = f"{path.stem}_translations.md"
+
     prompt_text = prompt or DEFAULT_PROMPT
-    script_content = _generate_script(image_paths, model, base_url, prompt_text)
-    script_path = out_dir / f"{path.stem}_translate.py"
+    script_content = _generate_script(image_paths, model, base_url, prompt_text, combined_filename)
+    script_path = out_dir / script_filename
     script_path.write_text(script_content, encoding="utf-8")
 
     return page_count, image_paths, script_path, script_content
@@ -142,6 +151,8 @@ async def render_and_generate_script(
     prompt: str | None = None,
     model: str = DEFAULT_MODEL,
     base_url: str = DEFAULT_BASE_URL,
+    script_filename: str | None = None,
+    combined_filename: str | None = None,
 ) -> Tuple[int, List[Path], Path, str]:
     return await asyncio.to_thread(
         render_and_generate_script_sync,
@@ -154,6 +165,8 @@ async def render_and_generate_script(
         prompt,
         model,
         base_url,
+        script_filename,
+        combined_filename,
     )
 
 
@@ -170,7 +183,9 @@ def run_script_sync(script_path: str, timeout: int = 600) -> Tuple[int, str, str
         cwd=str(path.parent),
     )
     combined = ""
-    combined_file = path.parent / "translations.md"
+    combined_file = path.with_name(path.stem.replace("_translate", "_translations") + ".md")
+    if not combined_file.is_file():
+        combined_file = path.parent / "translations.md"
     if combined_file.is_file():
         combined = combined_file.read_text(encoding="utf-8")
     return proc.returncode, proc.stdout, proc.stderr, combined
